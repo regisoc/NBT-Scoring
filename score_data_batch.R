@@ -66,10 +66,23 @@ for(i in 1:236){
   file_name=item_export_files[i]
   print(i)
   
+  # file name prefix 'ncl_ch_nbtb'
+  default_nbtb_prefix <- substring(file_name,1,11)
+
+  # line id 'PSCID_CANDID_VISIT'
+  match_id <- substring(file_name,13,32)
+
+  # full prefix
+  file_prefix <- paste0(default_nbtb_prefix,'_',match_id)
+
   # finds matching registration export to pull age
-  match_id<-str_split(file_name,pattern='_')[[1]][2]
-  item_export<-read.csv(paste0(item_export_path,'ItemExportNarrowStructure_',match_id)) 
-  registration_export<-read.csv(paste0(registration_export_path,'RegistrationExportNarrowStructure_',match_id))
+  item_export<-read.csv(paste0(item_export_path,file_prefix,'_ItemExportNarrowStructure'))
+  registration_export<-read.csv(paste0(registration_export_path,file_prefix,'_RegistrationExportNarrowStructure'))
+
+  # finds matching registration export to pull age
+  # match_id<-str_split(file_name,pattern='_')[[1]][2]
+  # item_export<-read.csv(paste0(item_export_path,'ItemExportNarrowStructure_',match_id))
+  # registration_export<-read.csv(paste0(registration_export_path,'RegistrationExportNarrowStructure_',match_id))
   
   # pull age information
   age<-registration_export%>% 
