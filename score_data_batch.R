@@ -46,9 +46,12 @@ source('scoring/check_calibration.R')
 ########### change the file path ########
 # note: item_export_path and registration_export_path require CSV files 
 
-item_export_path<-'/Volumes/Baby_Toolbox/NBT_Norming_2023/misc/' # change this to the folder for item exports
-registration_export_path<-'/Volumes/Baby_Toolbox/NBT_Norming_2023/misc/' # change this to the folder for registration exports
-json_export_path<-'/Volumes/Baby_Toolbox/NBT_Norming_2023/misc/' # change this to the folder for json (gaze) data 
+# default export
+result_folder<-"/data/nbt_scoring/"
+
+item_export_path<-result_folder         # change this to the folder for item exports
+registration_export_path<-result_folder # change this to the folder for registration exports
+json_export_path<-result_folder         # change this to the folder for json (gaze) data
 
 item_export_files<-list.files(item_export_path,pattern='ItemExportNarrowStructure') # do not change
 registration_export_files<-list.files(registration_export_path,pattern='RegistrationExportNarrowStructure') # do not change
