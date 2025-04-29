@@ -60,29 +60,23 @@ json_export_files<-list.files(json_export_path,pattern='AssessmentGazeData') # d
 
 ######### do not change below: this will run through all item exports and score them ###########
 
+# final output to be dump into a file
 all_output<-data.frame()
-# for(i in 1:length(item_export_files)){
-for(i in 1:236){
-  file_name=item_export_files[i]
-  print(i)
+
+# iterate over all export files
+for(i in 1:length(item_export_files)) {
   
-  # file name prefix 'ncl_ch_nbtb'
-  default_nbtb_prefix <- substring(file_name,1,11)
+  # scoring by file
+  file_name=item_export_files[i]
+  print(paste0("------ Scoring: ",file_name))
+  
+  # match_id format "PSCID_CANDID_VISIT" e.g. "DCC090_123456_V01"
+  t <- str_split(file_name,pattern='_')[[1]]
+  match_id <- paste0(t[2], '_', t[3], '_', t[4])
 
-  # line id 'PSCID_CANDID_VISIT'
-  match_id <- substring(file_name,13,32)
-
-  # full prefix
-  file_prefix <- paste0(default_nbtb_prefix,'_',match_id)
-
-  # finds matching registration export to pull age
-  item_export<-read.csv(paste0(item_export_path,file_prefix,'_ItemExportNarrowStructure'))
-  registration_export<-read.csv(paste0(registration_export_path,file_prefix,'_RegistrationExportNarrowStructure'))
-
-  # finds matching registration export to pull age
   # match_id<-str_split(file_name,pattern='_')[[1]][2]
-  # item_export<-read.csv(paste0(item_export_path,'ItemExportNarrowStructure_',match_id))
-  # registration_export<-read.csv(paste0(registration_export_path,'RegistrationExportNarrowStructure_',match_id))
+  item_export<-read.csv(paste0(item_export_path,'ItemExportNarrowStructure_',match_id))
+  registration_export<-read.csv(paste0(registration_export_path,'RegistrationExportNarrowStructure_',match_id))
   
   # pull age information
   age<-registration_export%>% 
@@ -384,4 +378,9 @@ for(i in 1:236){
 ###############################################################################
 
 # write output into csv - creates one file containing all participants' scores
-write.csv(all_output,file=paste0('ADD FILE PATH HERE/','all_output_scored.csv'),na='',row.names = F) # write out scored data to a CSV - change path name
+write.csv(
+  all_output,
+  file=paste0(result_folder,'all_output_scored.csv'),
+  na='',
+  row.names = F
+)
