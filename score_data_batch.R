@@ -380,7 +380,7 @@ for(i in 1:length(item_export_files)) {
 # write output into csv - creates one file containing all participants' scores
 write.csv(
   all_output,
-  file=paste0(result_folder,'all_output_scored.csv'),
+  file=paste0(result_folder,'ncl_ch_nbtb_scores.csv'),
   na='',
   row.names = F
 )
