@@ -53,10 +53,9 @@ item_export_path<-result_folder         # change this to the folder for item exp
 registration_export_path<-result_folder # change this to the folder for registration exports
 json_export_path<-result_folder         # change this to the folder for json (gaze) data
 
-item_export_files<-list.files(item_export_path,pattern='ItemExportNarrowStructure') # do not change
-registration_export_files<-list.files(registration_export_path,pattern='RegistrationExportNarrowStructure') # do not change
-json_export_files<-list.files(json_export_path,pattern='AssessmentGazeData') # do not change
-
+item_export_files         <-list.files(item_export_path,pattern='ItemExportNarrowStructure') # do not change
+registration_export_files <-list.files(registration_export_path,pattern='RegistrationExportNarrowStructure') # do not change
+json_export_files         <-list.files(json_export_path,pattern='AssessmentGazeData') # do not change
 
 ######### do not change below: this will run through all item exports and score them ###########
 
@@ -72,12 +71,13 @@ for(i in 1:length(item_export_files)) {
   
   # match_id format "PSCID_CANDID_VISIT" e.g. "DCC090_123456_V01"
   t <- str_split(file_name,pattern='_')[[1]]
-  match_id <- paste0(t[2], '_', t[3], '_', t[4])
+  instrument_name <- paste0(t[1], '_', t[2], '_', t[3]) # ncl_ch_nbtb
+  match_id        <- paste0(t[4], '_', t[5], '_', t[6]) # "PSCID_CANDID_VISIT"
 
   # match_id<-str_split(file_name,pattern='_')[[1]][2]
-  item_export<-read.csv(paste0(item_export_path,'ItemExportNarrowStructure_',match_id))
-  registration_export<-read.csv(paste0(registration_export_path,'RegistrationExportNarrowStructure_',match_id))
-  
+  item_export         <- read.csv(paste0(item_export_path,instrument_name,'_',match_id,'_ItemExportNarrowStructure.csv'))
+  registration_export <- read.csv(paste0(registration_export_path,instrument_name,'_',match_id,'_RegistrationExportNarrowStructure'))
+
   # pull age information
   age<-registration_export%>% 
     subset(Key=='TotalAgeInMonths')%>%
