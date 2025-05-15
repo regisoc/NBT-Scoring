@@ -47,14 +47,14 @@ source('scoring/check_calibration.R')
 # note: item_export_path and registration_export_path require CSV files 
 
 # default export
-result_folder<-"/data/nbt_scoring/"
+result_folder <- "/data/nbt_scoring/"
 
-item_export_path<-result_folder         # change this to the folder for item exports
-registration_export_path<-result_folder # change this to the folder for registration exports
-json_export_path<-result_folder         # change this to the folder for json (gaze) data
+item_export_path         <-result_folder # change this to the folder for item exports
+registration_export_path <-result_folder # change this to the folder for registration exports
+json_export_path         <-result_folder # change this to the folder for json (gaze) data
 
-item_export_files         <-list.files(item_export_path,pattern='ItemExportNarrowStructure') # do not change
-registration_export_files <-list.files(registration_export_path,pattern='RegistrationExportNarrowStructure') # do not change
+item_export_files         <-list.files(item_export_path,pattern='ItemExportNarrow') # do not change
+registration_export_files <-list.files(registration_export_path,pattern='RegistrationExportNarrow') # do not change
 json_export_files         <-list.files(json_export_path,pattern='AssessmentGazeData') # do not change
 
 ######### do not change below: this will run through all item exports and score them ###########
@@ -75,8 +75,8 @@ for(i in 1:length(item_export_files)) {
   match_id        <- paste0(t[4], '_', t[5], '_', t[6]) # "PSCID_CANDID_VISIT"
 
   # match_id<-str_split(file_name,pattern='_')[[1]][2]
-  item_export         <- read.csv(paste0(item_export_path,instrument_name,'_',match_id,'_ItemExportNarrowStructure.csv'))
-  registration_export <- read.csv(paste0(registration_export_path,instrument_name,'_',match_id,'_RegistrationExportNarrowStructure'))
+  item_export         <- read.csv(paste0(item_export_path,instrument_name,'_',match_id,'_ItemExportNarrow.csv'))
+  registration_export <- read.csv(paste0(registration_export_path,instrument_name,'_',match_id,'_RegistrationExportNarrow.csv'))
 
   # pull age information
   age<-registration_export%>% 
