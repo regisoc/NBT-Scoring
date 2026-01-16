@@ -28,7 +28,8 @@ score_mvr<-function(data){
     add_column(!!!mvr_cols[!names(mvr_cols) %in% names(.)])%>%
     mutate(mvr28_graded=case_when(mvr28==0|mvr28==1|mvr28==2|mvr28==3~0,
                                   mvr28==4|mvr28==5~1,
-                                  mvr28==6~2))%>%
+                                  mvr28==6~2,
+                                  .default=mvr28_graded))%>%
     dplyr::select(-mvr28)
   
   items_completed=clean_data%>%dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))

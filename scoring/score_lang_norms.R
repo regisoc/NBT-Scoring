@@ -1,4 +1,4 @@
-score_norming<-function(mr_css=NA,me_css=NA,mr_css_se=NA,me_css_se=NA,age=NA){
+score_lang_norms<-function(mr_css=NA,me_css=NA,mr_css_se=NA,me_css_se=NA,age=NA){
   require(tidyverse)
   
   load('norming/composite_sem.RData')
