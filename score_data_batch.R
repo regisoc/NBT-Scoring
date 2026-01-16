@@ -79,6 +79,9 @@ for(i in 1:length(item_export_files)){
   file_name=item_export_files[i]
   print(paste0("------ Scoring: ", file_name))
 
+  # filename without extension
+  barename <- str_split(file_name, pattern='.csv')[[1]][1]
+
   # match_id format "PSCID_CANDID_VISIT" e.g. "DCC090_123456_V01"
   t <- str_split(barename,pattern='_')[[1]]
   instrument_name <- paste0(t[1], '_', t[2], '_', t[3]) # ncl_ch_nbtb
