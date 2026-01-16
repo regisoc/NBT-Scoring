@@ -172,7 +172,7 @@ for(i in 1:length(file_name)){
       if('Looking While Listening' %in% item_export$InstrumentTitle){
         lwl_data<-item_export%>%
           filter(InstrumentTitle=='Looking While Listening')%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=lwl_data%>%
@@ -199,7 +199,7 @@ for(i in 1:length(file_name)){
         
         lwl_data<-item_export%>%
           filter(InstrumentTitle=='Looking While Listening (Spanish)')%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         lwl_scored<-score_lwl_sp(lwl_data)
@@ -218,7 +218,7 @@ for(i in 1:length(file_name)){
       if('Mullen Receptive' %in% item_export$InstrumentTitle || 'Mullen Receptive (Spanish)' %in% item_export$InstrumentTitle){
         mr_data<-item_export%>%
           filter(InstrumentTitle=='Mullen Receptive'|InstrumentTitle=='Mullen Receptive (Spanish)')%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=mr_data%>%
@@ -257,7 +257,7 @@ for(i in 1:length(file_name)){
           filter(InstrumentTitle=='Mullen Expressive Observational'|InstrumentTitle=='Mullen Expressive Prompted'|
                    InstrumentTitle=='Mullen Expressive Observational (Spanish)'|InstrumentTitle=='Mullen Expressive Prompted (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=me_data%>%
@@ -292,7 +292,7 @@ for(i in 1:length(file_name)){
         mvr_data<-item_export%>%
           filter(InstrumentTitle=='Mullen Visual Reception'|InstrumentTitle=='Mullen Visual Reception (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=mvr_data%>%
@@ -328,7 +328,7 @@ for(i in 1:length(file_name)){
         ef_data<-item_export%>%
           filter(InstrumentTitle=='Executive Function'|InstrumentTitle=='Executive Function (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         calibrated<-check_calibration(ef_data)
@@ -423,7 +423,7 @@ for(i in 1:length(file_name)){
         mtl_data<-item_export%>%
           filter(InstrumentTitle=='Memory Task Learning'|InstrumentTitle=='Memory Task Learning (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=mtl_data%>%
@@ -457,7 +457,7 @@ for(i in 1:length(file_name)){
         mtt_data<-item_export%>%
           filter(InstrumentTitle=='Memory Task Test'|InstrumentTitle=='Memory Task Test (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=mtt_data%>%
@@ -491,7 +491,7 @@ for(i in 1:length(file_name)){
         vdr_data<-item_export%>%
           filter(InstrumentTitle=='Visual Delayed Response'|InstrumentTitle=='Visual Delayed Response (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=vdr_data%>%
@@ -525,7 +525,7 @@ for(i in 1:length(file_name)){
         whm_data<-item_export%>%
           filter(InstrumentTitle=='Who Has More'|InstrumentTitle=='Who Has More (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=whm_data%>%
@@ -559,7 +559,7 @@ for(i in 1:length(file_name)){
         sub_data<-item_export%>%
           filter(InstrumentTitle=='Subitizing'|InstrumentTitle=='Subitizing (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=sub_data%>%
@@ -593,7 +593,7 @@ for(i in 1:length(file_name)){
         va_data<-item_export%>%
           filter(InstrumentTitle=='Verbal Arithmetic'|InstrumentTitle=='Verbal Arithmetic (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=va_data%>%
@@ -631,7 +631,7 @@ for(i in 1:length(file_name)){
         counting_data<-item_export%>%
           filter(str_detect(InstrumentTitle,'Counting'))%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
-          subset(Key=='Score')%>%
+          subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
         
         items_completed=counting_data%>%
@@ -711,7 +711,6 @@ for(i in 1:length(file_name)){
       }
     }
   }
-  
 }
 
 ###############################################################################
