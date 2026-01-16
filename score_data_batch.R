@@ -68,14 +68,27 @@ json_export_files         <-list.files(json_export_path,pattern='AssessmentGazeD
 
 # final output to be dump into a file
 all_output<-data.frame()
-for(i in 1:length(item_export_files)){ # uncomment this to run through batch files
-# for(i in 1:1){ # uncomment for testing
+for(i in 1:length(item_export_files)){
+  # scoring by file
+  # ex of filename
+  # ncl_ch_nbtb_QIUMN0013_523319_P06_ScoresExport_2024-03-22T153050.csv
+  # ncl_ch_nbtb_QINWU0022_523520_P06_RegistrationExport_2024-04-30T193955.csv
   file_name=item_export_files[i]
-  print(i)
+  print(paste0("------ Scoring: ", file_name))
+
+  # match_id format "PSCID_CANDID_VISIT" e.g. "DCC090_123456_V01"
+  t <- str_split(barename,pattern='_')[[1]]
+  instrument_name <- paste0(t[1], '_', t[2], '_', t[3]) # ncl_ch_nbtb
+  match_id        <- paste0(t[4], '_', t[5], '_', t[6]) # "PSCID_CANDID_VISIT"
+  timestamp       <- t[8]                               # 2024-04-30T193955 => not ISO-8601 compliant.
 
   # finds matching registration export to pull age
-  match_id<-str_split(file_name,pattern='_')[[1]][2]
-  item_export<-read.csv(paste0(item_export_path,'ItemExportNarrowStructure_',match_id))
+  # match_id<-str_split(file_name,pattern='_')[[1]][2]
+  # item_export<-read.csv(paste0(item_export_path,'ItemExportNarrowStructure_',match_id))
+
+  # match_id<-str_split(file_name,pattern='_')[[1]][2]
+  item_export         <- read.csv(paste0(item_export_path,instrument_name,'_',match_id,'_ItemExportNarrowStructure_',timestamp,'.csv'))
+  # registration_export <- read.csv(paste0(registration_export_path,instrument_name,'_',match_id,'_RegistrationExportNarrowStructure_',timestamp,'.csv'))
 
   # check for multiple ids
   item_export_ids<-item_export%>%distinct(PID)
