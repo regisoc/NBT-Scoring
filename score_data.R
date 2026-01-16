@@ -1,12 +1,12 @@
 ###############################################################################
 #### NIH Baby Toolbox scoring script ####
-# this script scores the following tests: Mullen Receptive (En and Sp), 
+# this script scores the following tests: Mullen Receptive (En and Sp),
 # Mullen Expressive (En and Sp), Mullen Visual Reception (En and Sp),
-# Executive Function (Familiarization) (En and Sp), 
+# Executive Function (Familiarization) (En and Sp),
 # and Looking While Listening (En and Sp).
 #
-# Newly added scoring functions for Executive Function/Memory (En and Sp): 
-# Memory Task Learning, Memory Task Test, Visual Delayed Response 
+# Newly added scoring functions for Executive Function/Memory (En and Sp):
+# Memory Task Learning, Memory Task Test, Visual Delayed Response
 # and Math (En and Sp):
 # Who Has More, Subitizing, Counting, Verbal Arithmetic
 #
@@ -65,7 +65,7 @@ source('scoring/check_calibration.R')
 
 ###############################################################################
 ########### change the file path for these exports ########
-# note: item_export_path and registration_export_path require CSV files 
+# note: item_export_path and registration_export_path require CSV files
 
 # default export
 result_folder<-"/data/nbt_scoring/"
@@ -78,21 +78,39 @@ item_export_files<-list.files(item_export_path,pattern='ItemExportNarrowStructur
 registration_export_files<-list.files(registration_export_path,pattern='RegistrationExportNarrowStructure') # do not change
 json_export_files<-list.files(json_export_path,pattern='AssessmentGazeData') # do not change
 
-############# change the file number ###########
 
-file_name<-item_export_files[360] # change this number to the item export you want to score
+
+############# change the file number ###########
 
 ######### do not change below: this will run through all item exports and score them ###########
 
 all_output<-data.frame()
-for(i in 1:length(file_name)){
+for(i in 1:length(item_export_files)){
 
-  file_name=file_name
-  
+  # scoring by file
+  # ex of filename
+  # ncl_ch_nbtb_QIUMN0013_523319_P06_ScoresExport_2024-03-22T153050.csv
+  # ncl_ch_nbtb_QINWU0022_523520_P06_RegistrationExport_2024-04-30T193955.csv
+  file_name=item_export_files[i]
+  print(paste0("------ Scoring: ", file_name))
+
+  # filename without extension
+  barename <- str_split(file_name, pattern='.csv')[[1]][1]
+
+  # match_id format "PSCID_CANDID_VISIT" e.g. "DCC090_123456_V01"
+  t <- str_split(barename,pattern='_')[[1]]
+  instrument_name <- paste0(t[1], '_', t[2], '_', t[3]) # ncl_ch_nbtb
+  match_id        <- paste0(t[4], '_', t[5], '_', t[6]) # "PSCID_CANDID_VISIT"
+  timestamp       <- t[8]                               # 2024-04-30T193955 => not ISO-8601 compliant.
+
   # finds matching registration export to pull age
-  match_id<-str_split(file_name,pattern='_')[[1]][2]
-  item_export<-read.csv(paste0(item_export_path,'ItemExportNarrowStructure_',match_id)) 
-  
+  # match_id<-str_split(file_name,pattern='_')[[1]][2]
+  # item_export<-read.csv(paste0(item_export_path,'ItemExportNarrowStructure_',match_id))
+
+  # match_id<-str_split(file_name,pattern='_')[[1]][2]
+  item_export         <- read.csv(paste0(item_export_path,instrument_name,'_',match_id,'_ItemExportNarrowStructure_',timestamp,'.csv'))
+  # registration_export <- read.csv(paste0(registration_export_path,instrument_name,'_',match_id,'_RegistrationExportNarrowStructure_',timestamp,'.csv'))
+
   # check for multiple ids
   item_export_ids<-item_export%>%distinct(PID)
   multiple_ids=F
@@ -100,7 +118,7 @@ for(i in 1:length(file_name)){
     multiple_ids=T
     print(paste('multiple PIDs found for ',file_name))
   }
-  
+
   # find registration export
   registration_export<-NULL
   if(paste0('RegistrationExportNarrowStructure_',match_id) %in% registration_export_files){
@@ -109,7 +127,7 @@ for(i in 1:length(file_name)){
   }else{
     print(paste0('no registration export not found for RegistrationExportNarrowStructure_',match_id))
     print('looking for approximate match')
-    
+
     # find approximate match (filename is some numbers off)
     registration_match<-str_split(match_id,'T')
     registration_match[[1]][2]<-str_remove(registration_match[[1]][2],'.csv')
@@ -128,19 +146,19 @@ for(i in 1:length(file_name)){
       }
     }
   }
-  
+
   # double check pid is the same between registration and item export
   if(!is.null(registration_export)){
-    
+
     registration_export_ids=registration_export%>%distinct(PID)
     print(paste('registration export ids:',registration_export_ids))
     print(paste('item export ids:',item_export_ids))
-    
+
     # pull out matching PIDs
     matching_reg_ids<-registration_export_ids$PID[registration_export_ids$PID %in% item_export_ids$PID]
     print(paste('registration export ids:',registration_export_ids))
     print(paste('item export ids:',item_export_ids))
-    
+
     # pull out age info
     reg_id_df<-registration_export%>%
       subset(Key=='TotalAgeInMonths')%>%
@@ -152,12 +170,12 @@ for(i in 1:length(file_name)){
       group_by(PID)%>%
       slice(1)%>%
       ungroup()
-    
+
   }else{
     print('no registration export')
     reg_id_df=NULL
   }
-  
+
   # if multiple ids, runs through for loop to score all of them
   if(is.null(reg_id_df)){
     print('no registration file for this item export, cannot score')
@@ -165,20 +183,20 @@ for(i in 1:length(file_name)){
     for(id in 1:nrow(reg_id_df)){
       age=reg_id_df$age[id]
       pid=reg_id_df$PID[id]
-      
+
       ###############################################################################
-      
+
       #### score LWL ####
       if('Looking While Listening' %in% item_export$InstrumentTitle){
         lwl_data<-item_export%>%
           filter(InstrumentTitle=='Looking While Listening')%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=lwl_data%>%
           dplyr::select(contains(c('G1','G2','G3','G4','G5')))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           lwl_scored=NULL
           print('no LWL items')
@@ -194,37 +212,37 @@ for(i in 1:length(file_name)){
                    age=age)
           print('Successfully scored LWL English')
         }
-        
+
       }else if('Looking While Listening (Spanish)' %in% item_export$InstrumentTitle){
-        
+
         lwl_data<-item_export%>%
           filter(InstrumentTitle=='Looking While Listening (Spanish)')%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         lwl_scored<-score_lwl_sp(lwl_data)
         lwl_scored<-as.data.frame(t(lwl_scored))%>%
           mutate(score='LWL Sp',
                  pid=pid,
                  age=age)
         print('Successfully scored LWL Spanish')
-        
+
       }else{
         print('no LWL data')
         lwl_scored<-NULL
       }
-      
+
       #### score Mullen Receptive ####
       if('Mullen Receptive' %in% item_export$InstrumentTitle || 'Mullen Receptive (Spanish)' %in% item_export$InstrumentTitle){
         mr_data<-item_export%>%
           filter(InstrumentTitle=='Mullen Receptive'|InstrumentTitle=='Mullen Receptive (Spanish)')%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=mr_data%>%
           dplyr::select(contains('RL'))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           mr_scored=NULL
           print('No MR items')
@@ -237,18 +255,18 @@ for(i in 1:length(file_name)){
                    pid=pid,
                    age=age)
           print('Succesfully scored MR')
-          
+
           if(is.na(mr_scored$mirtTheta_1)){
             mr_scored<-NULL
             print ('No MR theta score')
           }
         }
-        
+
       }else{
         print('no MR data')
         mr_scored<-NULL
       }
-      
+
       #### score Mullen Expressive ####
       if('Mullen Expressive Observational' %in% item_export$InstrumentTitle||'Mullen Expressive Prompted' %in% item_export$InstrumentTitle||
          'Mullen Expressive Observational (Spanish)' %in% item_export$InstrumentTitle||
@@ -259,11 +277,11 @@ for(i in 1:length(file_name)){
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=me_data%>%
           dplyr::select(contains('EL'))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           print('completed 0 items')
           me_scored=NULL
@@ -275,30 +293,30 @@ for(i in 1:length(file_name)){
                    CSS_SE=analyticSE1*9.1024,
                    pid=pid,
                    age=age)
-          
+
           if(is.na(me_scored$mirtTheta_1)){
             me_scored<-NULL
           }
         }
-        
+
       }else{
         print('no ME data')
         me_scored<-NULL
       }
-      
+
       #### score Mullen Visual Reception ####
-      if('Mullen Visual Reception' %in% item_export$InstrumentTitle || 
+      if('Mullen Visual Reception' %in% item_export$InstrumentTitle ||
          'Mullen Visual Reception (Spanish)' %in% item_export$InstrumentTitle){
         mvr_data<-item_export%>%
           filter(InstrumentTitle=='Mullen Visual Reception'|InstrumentTitle=='Mullen Visual Reception (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=mvr_data%>%
           dplyr::select(contains(c('MVR','RL')))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           mvr_scored=NULL
         }else{
@@ -312,29 +330,29 @@ for(i in 1:length(file_name)){
                    pid=pid,
                    age=age)
         }
-        
+
       }else{
         print('no MVR data')
         mvr_scored<-NULL
       }
-      
+
       #### score Familiarization ####
       if('Executive Function' %in% item_export$InstrumentTitle ||
          'Executive Function (Spanish)' %in% item_export$InstrumentTitle){
-        
+
         ef_warning=NA
-        
+
         # check calibration first - if calibration unsuccessful, no familiarization score
         ef_data<-item_export%>%
           filter(InstrumentTitle=='Executive Function'|InstrumentTitle=='Executive Function (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         calibrated<-check_calibration(ef_data)
-        
+
         if(calibrated==1&&length(calibrated)>0){
-          
+
           # find approximate match (json file name is some numbers off)
           json_match<-str_split(match_id,'T')
           json_match[[1]][2]<-str_remove(json_match[[1]][2],'.csv')
@@ -351,7 +369,7 @@ for(i in 1:length(file_name)){
               }
             }
           }
-          
+
           # double check pid is the same
           if(!is.null(json_export)){
             if(!is.null(json_export[[1]]$dataPairs)){
@@ -368,7 +386,7 @@ for(i in 1:length(file_name)){
               print(ef_warning)
             }
           }
-          
+
           # pull ef data
           correct_data=NA
           if(!is.null(json_export)){
@@ -385,13 +403,13 @@ for(i in 1:length(file_name)){
               }
             }
           }
-          
-          # pull fps 
+
+          # pull fps
           # real_fps<-json_export[[correct_data]]%>%subset(dataKey=='arFramesPerSecond_test_actual')%>%pull(dataValue)%>%as.numeric()
-          
+
           # pull raw json data
           ef_data<-json_export[[correct_data]]
-          
+
           # externally score json data
           if(is.null(ef_data)){
             ef_scored<-NULL
@@ -411,25 +429,25 @@ for(i in 1:length(file_name)){
                                 age=age,
                                 message=ef_warning)
         }
-        
+
       }else{
         print('no EF data')
         ef_scored<-NULL
       }
-      
+
       #### score Memory Task Learning ####
-      if('Memory Task Learning' %in% item_export$InstrumentTitle || 
+      if('Memory Task Learning' %in% item_export$InstrumentTitle ||
          'Memory Task Learning (Spanish)' %in% item_export$InstrumentTitle){
         mtl_data<-item_export%>%
           filter(InstrumentTitle=='Memory Task Learning'|InstrumentTitle=='Memory Task Learning (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=mtl_data%>%
           dplyr::select(contains('Encoding'))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           mtl_scored=NULL
           print('no MTL items')
@@ -445,25 +463,25 @@ for(i in 1:length(file_name)){
                    age=age)
           print('Successfully scored MTL')
         }
-        
+
       }else{
         print('no MTL data')
         mtl_scored<-NULL
       }
-      
+
       #### score Memory Task Test ####
-      if('Memory Task Test' %in% item_export$InstrumentTitle || 
+      if('Memory Task Test' %in% item_export$InstrumentTitle ||
          'Memory Task Test (Spanish)' %in% item_export$InstrumentTitle){
         mtt_data<-item_export%>%
           filter(InstrumentTitle=='Memory Task Test'|InstrumentTitle=='Memory Task Test (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=mtt_data%>%
           dplyr::select(contains('MemTest'))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           mtt_scored=NULL
           print('no MTT items')
@@ -479,25 +497,25 @@ for(i in 1:length(file_name)){
                    age=age)
           print('Successfully scored MTT')
         }
-        
+
       }else{
         print('no MTT data')
         mtt_scored<-NULL
       }
-      
+
       #### score Visual Delayed Response ####
-      if('Visual Delayed Response' %in% item_export$InstrumentTitle || 
+      if('Visual Delayed Response' %in% item_export$InstrumentTitle ||
          'Visual Delayed Response (Spanish)' %in% item_export$InstrumentTitle){
         vdr_data<-item_export%>%
           filter(InstrumentTitle=='Visual Delayed Response'|InstrumentTitle=='Visual Delayed Response (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=vdr_data%>%
           dplyr::select(contains(paste0('VDRTouch_',c(4:11))))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           vdr_scored=NULL
           print('no VDR items')
@@ -513,25 +531,25 @@ for(i in 1:length(file_name)){
                    age=age)
           print('Successfully scored VDR')
         }
-        
+
       }else{
         print('no VDR data')
         vdr_scored<-NULL
       }
-      
+
       #### score Who Has More ####
-      if('Who Has More' %in% item_export$InstrumentTitle || 
+      if('Who Has More' %in% item_export$InstrumentTitle ||
          'Who Has More (Spanish)' %in% item_export$InstrumentTitle){
         whm_data<-item_export%>%
           filter(InstrumentTitle=='Who Has More'|InstrumentTitle=='Who Has More (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=whm_data%>%
           dplyr::select(contains(paste0('WHM',c(1:22))))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           whm_scored=NULL
           print('no WHM items')
@@ -547,25 +565,25 @@ for(i in 1:length(file_name)){
                    age=age)
           print('Successfully scored WHM')
         }
-        
+
       }else{
         print('no WHM data')
         whm_scored<-NULL
       }
-      
+
       #### score Subitizing ####
-      if('Subitizing' %in% item_export$InstrumentTitle || 
+      if('Subitizing' %in% item_export$InstrumentTitle ||
          'Subitizing (Spanish)' %in% item_export$InstrumentTitle){
         sub_data<-item_export%>%
           filter(InstrumentTitle=='Subitizing'|InstrumentTitle=='Subitizing (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=sub_data%>%
           dplyr::select(contains(paste0('NRS')))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           sub_scored=NULL
           print('no SUB items')
@@ -581,25 +599,25 @@ for(i in 1:length(file_name)){
                    age=age)
           print('Successfully scored SUB')
         }
-        
+
       }else{
         print('no SUB data')
         sub_scored<-NULL
       }
-      
+
       #### score Verbal Arithmetic ####
-      if('Verbal Arithmetic' %in% item_export$InstrumentTitle || 
+      if('Verbal Arithmetic' %in% item_export$InstrumentTitle ||
          'Verbal Arithmetic (Spanish)' %in% item_export$InstrumentTitle){
         va_data<-item_export%>%
           filter(InstrumentTitle=='Verbal Arithmetic'|InstrumentTitle=='Verbal Arithmetic (Spanish)')%>%
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=va_data%>%
           dplyr::select(contains(paste0('REMA')))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           va_scored=NULL
           print('no VA items')
@@ -615,17 +633,17 @@ for(i in 1:length(file_name)){
                    age=age)
           print('Successfully scored VA')
         }
-        
+
       }else{
         print('no VA data')
         va_scored<-NULL
       }
-      
+
       #### score Counting ####
-      # Note: uses both Verbal Counting and Object Counting data 
+      # Note: uses both Verbal Counting and Object Counting data
       # these are combined under "Counting" post-norming
-      if('Object Counting' %in% item_export$InstrumentTitle || 
-         'Verbal Counting' %in% item_export$InstrumentTitle || 
+      if('Object Counting' %in% item_export$InstrumentTitle ||
+         'Verbal Counting' %in% item_export$InstrumentTitle ||
          'Object Counting (Spanish)' %in% item_export$InstrumentTitle||
          'Verbal Counting (Spanish)' %in% item_export$InstrumentTitle){
         counting_data<-item_export%>%
@@ -633,11 +651,11 @@ for(i in 1:length(file_name)){
           dplyr::select(-c('InstrumentID','InstrumentTitle'))%>%
           subset(Key=='Score'&PID==pid)%>%
           pivot_wider(names_from=ItemID,values_from=Value)
-        
+
         items_completed=counting_data%>%
           dplyr::select(contains(c('VC','OC')))%>%
           dplyr::select_if(~sum(!is.na(.))>0)%>%with(length(.))
-        
+
         if(items_completed==0){
           counting_scored=NULL
           print('no Counting items')
@@ -653,12 +671,12 @@ for(i in 1:length(file_name)){
                    age=age)
           print('Successfully scored Counting')
         }
-        
+
       }else{
         print('no Counting data')
         counting_scored<-NULL
       }
-      
+
       #### score Language composite + get norms ####
       if(!is.null(mr_scored)&&!is.null(me_scored)){
         lang_norms=score_lang_norms(mr_css=mr_scored$CSS,
@@ -687,7 +705,7 @@ for(i in 1:length(file_name)){
       }else{
         lang_norms=NULL
       }
-      
+
       #### output scored data into a table #####
       output<-data.frame(lang_norms)%>%
         dplyr::bind_rows(mvr_scored)%>%
@@ -700,9 +718,9 @@ for(i in 1:length(file_name)){
         dplyr::bind_rows(sub_scored)%>%
         dplyr::bind_rows(va_scored)%>%
         dplyr::bind_rows(counting_scored)
-      
+
       print(output) # view output
-      
+
       if(nrow(output)==0){
         'no data to add'
       }else{
@@ -711,6 +729,10 @@ for(i in 1:length(file_name)){
       }
     }
   }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 }
 
 ###############################################################################
