@@ -90,6 +90,7 @@ for(i in 1:length(item_export_files)){
 
   # match_id<-str_split(file_name,pattern='_')[[1]][2]
   item_export <- read.csv(paste0(item_export_path,instrument_name,'_',match_id,'_ItemExportNarrowStructure_',timestamp,'.csv'))
+  registration_export <- read.csv(paste0(registration_export_path,instrument_name,'_',match_id,'_RegistrationExportNarrowStructure_',timestamp,'.csv'))
 
   # check for multiple ids
   item_export_ids<-item_export%>%distinct(PID)
@@ -99,33 +100,33 @@ for(i in 1:length(item_export_files)){
     print(paste('multiple PIDs found for ',file_name))
   }
 
-  # find registration export
-  registration_export<-NULL
-  if(paste0('RegistrationExportNarrowStructure_',match_id) %in% registration_export_files){
-    print(paste0('exact match: registration export found for RegistrationExportNarrowStructure_',match_id))
-    registration_export<-read.csv(paste0(registration_export_path,'RegistrationExportNarrowStructure_',match_id))
-  }else{
-    print(paste0('no registration export not found for RegistrationExportNarrowStructure_',match_id))
-    print('looking for approximate match')
+  # # find registration export
+  # registration_export<-NULL
+  # if(paste0('RegistrationExportNarrowStructure_',match_id) %in% registration_export_files){
+  #   print(paste0('exact match: registration export found for RegistrationExportNarrowStructure_',match_id))
+  #   registration_export<-read.csv(paste0(registration_export_path,'RegistrationExportNarrowStructure_',match_id))
+  # }else{
+  #   print(paste0('no registration export not found for RegistrationExportNarrowStructure_',match_id))
+  #   print('looking for approximate match')
 
-    # find approximate match (filename is some numbers off)
-    registration_match<-str_split(match_id,'T')
-    registration_match[[1]][2]<-str_remove(registration_match[[1]][2],'.csv')
-    registration_match[[1]][2]<-as.numeric(registration_match[[1]][2])-1
-    registration_export=NULL
-    for(k in 1:length(registration_export_files)){
-      match_date<-str_detect(registration_export_files[k],registration_match[[1]][1])
-      if(match_date==T){
-        # print(paste(i,'date match',registration_export_files[k],registration_match[[1]][1]))
-        temp_file<-str_split(registration_export_files[k],'T')
-        temp_file<-str_remove(temp_file[[1]][2],'.csv')%>%as.numeric()
-        if(temp_file<=as.numeric(registration_match[[1]][2])+5&&temp_file>=as.numeric(registration_match[[1]][2])-5){
-          registration_export<-read.csv(paste0(registration_export_path,registration_export_files[k]))
-          print('found approximate registration export match')
-        }
-      }
-    }
-  }
+  #   # find approximate match (filename is some numbers off)
+  #   registration_match<-str_split(match_id,'T')
+  #   registration_match[[1]][2]<-str_remove(registration_match[[1]][2],'.csv')
+  #   registration_match[[1]][2]<-as.numeric(registration_match[[1]][2])-1
+  #   registration_export=NULL
+  #   for(k in 1:length(registration_export_files)){
+  #     match_date<-str_detect(registration_export_files[k],registration_match[[1]][1])
+  #     if(match_date==T){
+  #       # print(paste(i,'date match',registration_export_files[k],registration_match[[1]][1]))
+  #       temp_file<-str_split(registration_export_files[k],'T')
+  #       temp_file<-str_remove(temp_file[[1]][2],'.csv')%>%as.numeric()
+  #       if(temp_file<=as.numeric(registration_match[[1]][2])+5&&temp_file>=as.numeric(registration_match[[1]][2])-5){
+  #         registration_export<-read.csv(paste0(registration_export_path,registration_export_files[k]))
+  #         print('found approximate registration export match')
+  #       }
+  #     }
+  #   }
+  # }
 
   # double check pid is the same between registration and item export
   if(!is.null(registration_export)){
