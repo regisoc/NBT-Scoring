@@ -353,7 +353,11 @@ for(i in 1:length(item_export_files)){
 
           # exact file name
           json_file_name <- paste0(json_export_path,instrument_name,'_',match_id,'_AssessmentGazeData_',timestamp,'.json')
-          json_export <- jsonlite::read_json(json_file_name, simplifyVector=T)
+          if (file.exists(json_file_name)) {
+            json_export <- jsonlite::read_json(json_file_name, simplifyVector=T)
+          } else {
+            json_export <- NULL
+          }
 
           # double check pid is the same
           if(!is.null(json_export)){
