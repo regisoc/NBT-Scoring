@@ -89,8 +89,8 @@ for(i in 1:length(item_export_files)){
   timestamp       <- t[8]                               # 2024-04-30T193955 => not ISO-8601 compliant.
 
   # match_id<-str_split(file_name,pattern='_')[[1]][2]
-  item_export <- read.csv(paste0(item_export_path,instrument_name,'_',match_id,'_ItemExportNarrowStructure_',timestamp,'.csv'))
-  registration_export <- read.csv(paste0(registration_export_path,instrument_name,'_',match_id,'_RegistrationExportNarrowStructure_',timestamp,'.csv'))
+  item_export <- readr::read_csv(paste0(item_export_path,instrument_name,'_',match_id,'_ItemExportNarrowStructure_',timestamp,'.csv'))
+  registration_export <- readr::read_csv(paste0(registration_export_path,instrument_name,'_',match_id,'_RegistrationExportNarrowStructure_',timestamp,'.csv'))
 
   # check for multiple ids
   item_export_ids<-item_export%>%distinct(PID)
