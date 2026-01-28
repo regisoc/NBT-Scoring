@@ -334,22 +334,26 @@ for(i in 1:length(item_export_files)){
 
         if(calibrated==1&&length(calibrated)>0){
 
-          # find approximate match (json file name is some numbers off)
-          json_match<-str_split(match_id,'T')
-          json_match[[1]][2]<-str_remove(json_match[[1]][2],'.csv')
-          json_match[[1]][2]<-as.numeric(json_match[[1]][2])-1
-          json_export=NULL
-          for(i in 1:length(json_export_files)){
-            match_date<-str_detect(json_export_files[i],json_match[[1]][1])
-            if(match_date==T){
-              # print(paste(i,'date match',json_export_files[i],json_match[[1]][1]))
-              temp_file<-str_split(json_export_files[i],'T')
-              temp_file<-str_remove(temp_file[[1]][2],'.json')%>%as.numeric()
-              if(temp_file<=as.numeric(json_match[[1]][2])+5&&temp_file>=as.numeric(json_match[[1]][2])-5){
-                json_export<-jsonlite::read_json(paste0(json_export_path,json_export_files[i]),simplifyVector=T)
-              }
-            }
-          }
+          # # find approximate match (json file name is some numbers off)
+          # json_match<-str_split(match_id,'T')
+          # json_match[[1]][2]<-str_remove(json_match[[1]][2],'.csv')
+          # json_match[[1]][2]<-as.numeric(json_match[[1]][2])-1
+          # json_export=NULL
+          # for(i in 1:length(json_export_files)){
+          #   match_date<-str_detect(json_export_files[i],json_match[[1]][1])
+          #   if(match_date==T){
+          #     # print(paste(i,'date match',json_export_files[i],json_match[[1]][1]))
+          #     temp_file<-str_split(json_export_files[i],'T')
+          #     temp_file<-str_remove(temp_file[[1]][2],'.json')%>%as.numeric()
+          #     if(temp_file<=as.numeric(json_match[[1]][2])+5&&temp_file>=as.numeric(json_match[[1]][2])-5){
+          #       json_export<-jsonlite::read_json(paste0(json_export_path,json_export_files[i]),simplifyVector=T)
+          #     }
+          #   }
+          # }
+
+          # exact file name
+          json_file_name <- paste0(json_export_path,instrument_name,'_',match_id,'_AssessmentGazeData_',timestamp,'.json')
+          json_export <- jsonlite::read_json(json_file_name, simplifyVector=T)
 
           # double check pid is the same
           if(!is.null(json_export)){
