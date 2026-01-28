@@ -140,17 +140,22 @@ for(i in 1:length(item_export_files)){
     print(paste('registration export ids:',registration_export_ids))
     print(paste('item export ids:',item_export_ids))
 
-    # pull out age info
-    reg_id_df<-registration_export%>%
-      subset(Key=='TotalAgeInMonths')%>%
-      mutate(Value=as.numeric(Value),
-             PID=as.character(PID))%>%
-      pivot_wider(names_from=Key,values_from=Value)%>%
-      rename(age=TotalAgeInMonths)%>%
-      select(c(PID,age))%>%
-      group_by(PID)%>%
-      slice(1)%>%
-      ungroup()
+    if (!("TotalAgeInMonths" %in% registration_export$Key)) {
+      reg_id_df <- NULL
+    } else {
+      # pull out age info
+      reg_id_df<-registration_export%>%
+        subset(Key=='TotalAgeInMonths')%>%
+        mutate(Value=as.numeric(Value),
+              PID=as.character(PID))%>%
+        pivot_wider(names_from=Key,values_from=Value)%>%
+        rename(age=TotalAgeInMonths)%>%
+        select(c(PID,age))%>%
+        group_by(PID)%>%
+        slice(1)%>%
+        ungroup()
+    }
+
 
   }else{
     print('no registration export')
