@@ -1,6 +1,7 @@
 score_ef<-function(data){
   require(tidyverse)
-  
+  require(janitor)
+
   # clean up json data to only select look detection portion.
   hab_item_by_id_temp<-data%>%
     clean_names()%>%
