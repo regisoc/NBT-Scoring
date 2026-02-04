@@ -361,6 +361,7 @@ for(i in 1:length(item_export_files)){
           if (file.exists(json_file_name)) {
             json_export <- jsonlite::read_json(json_file_name, simplifyVector=T)
           } else {
+            print(paste0("No exact Assessment Gaze JSON file name match for ", match_id))
             json_export <- NULL
           }
 
@@ -402,7 +403,11 @@ for(i in 1:length(item_export_files)){
           # real_fps<-json_export[[correct_data]]%>%subset(dataKey=='arFramesPerSecond_test_actual')%>%pull(dataValue)%>%as.numeric()
 
           # pull raw json data
-          ef_data<-json_export[[correct_data]]
+          if (!is.null(json_export) && !is.na(correct_data)) {
+            ef_data<-json_export[[correct_data]]
+          } else {
+            ef_data <- NULL
+          }
 
           # externally score json data
           if(is.null(ef_data)){
