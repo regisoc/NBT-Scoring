@@ -69,6 +69,11 @@ json_export_files         <-list.files(json_export_path,pattern='AssessmentGazeD
 
 ######### do not change below: this will run through all item exports and score them ###########
 
+# match ids to skip
+excluded_match_ids <- c(
+  "CHCCH0177_587280_V04"
+)
+
 # final output to be dump into a file
 all_output<-data.frame()
 for(i in 1:length(item_export_files)){
@@ -77,7 +82,7 @@ for(i in 1:length(item_export_files)){
   # ncl_ch_nbtb_QIUMN0013_523319_P06_ScoresExport_2024-03-22T153050.csv
   # ncl_ch_nbtb_QINWU0022_523520_P06_RegistrationExport_2024-04-30T193955.csv
   file_name=item_export_files[i]
-  print(paste0("------ Scoring: ",file_name))
+  print(paste0("------ Scoring [",i,"]: ",file_name))
 
   # filename without extension
   barename <- str_split(file_name, pattern='.csv')[[1]][1]
@@ -86,7 +91,12 @@ for(i in 1:length(item_export_files)){
   t <- str_split(barename,pattern='_')[[1]]
   instrument_name <- paste0(t[1], '_', t[2], '_', t[3]) # ncl_ch_nbtb
   match_id        <- paste0(t[4], '_', t[5], '_', t[6]) # "PSCID_CANDID_VISIT"
-  timestamp       <- t[8]                               # 2024-04-30T193955 => not ISO-8601 compliant.
+  timestamp       <- t[8]                               # 2024-04-30T193955 => not ISO-8601 compliant.\
+
+  # skip item
+  if (match_id %in% excluded_match_ids) {
+    next
+  }
 
   # match_id<-str_split(file_name,pattern='_')[[1]][2]
   item_export <- readr::read_csv(paste0(item_export_path,instrument_name,'_',match_id,'_ItemExportNarrowStructure_',timestamp,'.csv'))
