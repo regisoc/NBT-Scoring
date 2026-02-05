@@ -71,8 +71,11 @@ json_export_files         <-list.files(json_export_path,pattern='AssessmentGazeD
 
 # match ids to skip
 excluded_match_ids <- c(
-  "CHCCH0177_587280_V04", # not sure yet, Catherine to look into the JSON file for missing gazeLocationOnScreen
-  "CHCHL0056_575298_V06", # missing MTBfx lib?
+  # not sure yet, Catherine to look into the JSON file for missing gazeLocationOnScreen
+  "CHCCH0177_587280_V04",
+  # missing MTBfx lib?
+  "CHCHL0056_575298_V06",
+  "CHEUY0018_116400_V06"
 )
 
 # final output to be dump into a file
