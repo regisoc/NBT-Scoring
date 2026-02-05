@@ -31,6 +31,7 @@ library(mnormt)
 library(nlme)
 library(jsonlite)
 library(purrr)
+library('MTBfx')
 
 # set directory - if this doesn't work, click Session >> Set Working Directory >> To Source File Location
 setwd(getwd())
