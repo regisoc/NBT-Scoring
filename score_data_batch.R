@@ -75,7 +75,8 @@ excluded_match_ids <- c(
   "CHCCH0177_587280_V04",
   # missing MTBfx lib?
   "CHCHL0056_575298_V06",
-  "CHEUY0018_116400_V06"
+  "CHEUY0018_116400_V06",
+  "CHEUY0028_759042_V06",
 )
 
 # final output to be dump into a file
