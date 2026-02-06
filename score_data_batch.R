@@ -80,7 +80,9 @@ excluded_match_ids <- c(
   "CHEUY0028_759042_V06",
   "CHJHU0008_785081_V06",
   # missing RegistrationExportNarrowStructure file
-  "CHOSU0110_778203_V03"
+  "CHOSU0110_778203_V03",
+  # missing zscore?
+  "QISTL0068_729758_P04"
 )
 
 # final output to be dump into a file
