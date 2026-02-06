@@ -58,11 +58,12 @@ source('scoring/check_calibration.R')
 # note: item_export_path and registration_export_path require CSV files
 
 # default export
-result_folder <- "/data/nbt_scoring/"
+data_folder   <- "/data/nbt_scoring/"
+result_folder <- "/data/nbt_scoring_result/"
 
-item_export_path         <-result_folder # change this to the folder for item exports
-registration_export_path <-result_folder # change this to the folder for registration exports
-json_export_path         <-result_folder # change this to the folder for json (gaze) data
+item_export_path         <-data_folder # change this to the folder for item exports
+registration_export_path <-data_folder # change this to the folder for registration exports
+json_export_path         <-data_folder # change this to the folder for json (gaze) data
 
 item_export_files         <-list.files(item_export_path,pattern='ItemExportNarrow') # do not change
 registration_export_files <-list.files(registration_export_path,pattern='RegistrationExportNarrow') # do not change
