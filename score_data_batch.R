@@ -34,11 +34,7 @@ library(mnormt)
 library(nlme)
 library(jsonlite)
 library(purrr)
-<<<<<<< HEAD
-library('MTBfx')
-=======
 library(MTBfx)
->>>>>>> main
 
 # set directory - if this doesn't work, click Session >> Set Working Directory >> To Source File Location
 setwd(getwd())
@@ -98,16 +94,11 @@ excluded_match_ids <- c(
 
 # final output to be dump into a file
 all_output<-data.frame()
-<<<<<<< HEAD
 for(i in 1:length(item_export_files)){
   # scoring by file
   # ex of filename
   # ncl_ch_nbtb_QIUMN0013_523319_P06_ScoresExport_2024-03-22T153050.csv
   # ncl_ch_nbtb_QINWU0022_523520_P06_RegistrationExport_2024-04-30T193955.csv
-=======
-for(i in 1:length(item_export_files)){ # uncomment this to run through batch files
-# for(i in 1:1){ # uncomment for testing or to specify a file
->>>>>>> main
   file_name=item_export_files[i]
   print(paste0("------ Scoring [",i,"]: ",file_name))
 
@@ -316,12 +307,8 @@ for(i in 1:length(item_export_files)){ # uncomment this to run through batch fil
                    CSS_SE=analyticSE1*9.1024,
                    pid=pid,
                    age=age)
-<<<<<<< HEAD
-
-=======
           print('Successfully scored ME')
-          
->>>>>>> main
+
           if(is.na(me_scored$mirtTheta_1)){
             me_scored<-NULL
             print('no ME score')
@@ -750,10 +737,7 @@ for(i in 1:length(item_export_files)){ # uncomment this to run through batch fil
       }else{
         lang_norms=NULL
       }
-<<<<<<< HEAD
 
-=======
-      
       #### score EFMem composite + get norms ####
       if(!is.null(mtl_scored)&&!is.null(mtt_scored)&&!is.null(vdr_scored)&&
          age>=22&&age<=42){
@@ -769,7 +753,7 @@ for(i in 1:length(item_export_files)){ # uncomment this to run through batch fil
       }else{
         efmem_norms=NULL
       }
-      
+
       #### score Math composite + get norms ####
       if(!is.null(whm_scored)&&!is.null(sub_scored)&&!is.null(counting_scored)&&
          age>=25&&age<=42){
@@ -785,7 +769,7 @@ for(i in 1:length(item_export_files)){ # uncomment this to run through batch fil
       }else{
         math_norms=NULL
       }
-      
+
       #### score Cognition composite + get norms ####
       if(!is.null(mr_scored)&&!is.null(me_scored)&&
          !is.null(mtl_scored)&&!is.null(mtt_scored)&&!is.null(vdr_scored)&&
@@ -813,8 +797,7 @@ for(i in 1:length(item_export_files)){ # uncomment this to run through batch fil
       }else{
         cog_norms=NULL
       }
-      
->>>>>>> main
+
       #### output scored data into a table #####
       output<-data.frame(lang_norms)%>%
         dplyr::bind_rows(efmem_norms)%>%
