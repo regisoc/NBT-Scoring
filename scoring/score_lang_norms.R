@@ -5,13 +5,14 @@ score_lang_norms<-function(mr_css=NA,me_css=NA,mr_css_se=NA,me_css_se=NA,age=NA)
   load('norming/lang_wgts.RData')
   load('norming/refs.RData')
   
-  lang_composite_sem<-composite_sem%>%subset(Composite=='Language')
+  lang_composite_sem<-composite_sem%>%subset(Composite=='Mullen Language Composite')
   lang_wgts<-lang_wgts%>%
+    dplyr::select(-c('scoreType','instrument+score reference'))%>%
     mutate(instrument=case_when(instrument=='Mullen Receptive'~'MR',
-                                instrument=='Mullen Expressive - Observational/Prompted'~'ME'))%>%
-    pivot_wider(names_from='instrument',values_from=cs(meanVector,sdVector,weights))
+                                instrument=='Mullen Expressive'~'ME'))%>%
+    pivot_wider(names_from='instrument',values_from=c('meanVector','sdVector','weights'))
   lang_refs<-refs%>%
-    dplyr::select(c('CAMOS','lang_ref','lang_sd'))
+    dplyr::select(c('CAMOS','MullenLang_ref','MullenLang_sd'))
   mr_refs<-refs%>%
     dplyr::select(c('CAMOS','MullenRec_ref','MullenRec_sd'))
   me_refs<-refs%>%
@@ -30,31 +31,31 @@ score_lang_norms<-function(mr_css=NA,me_css=NA,mr_css_se=NA,me_css_se=NA,age=NA)
     # css composite
     mutate(composite_CSS=interim_composite_css*15.47408+430,
            composite_CSS_SE=lang_composite_sem$SEM)%>%
-    dplyr::select(-c(4:(ncol(lang_wgts)+4)))%>%
+    # dplyr::select(-c(4:(ncol(lang_wgts)+4)))%>%
     left_join(lang_refs,by='CAMOS')%>%
     # ss 
-    mutate(composite_zscore=((composite_CSS-lang_ref)/lang_sd),
+    mutate(composite_zscore=((composite_CSS-MullenLang_ref)/MullenLang_sd),
            composite_SS=composite_zscore*15+100,
-           winsorize=case_when(composite_SS<46~'yes',
+           winsorize=case_when(composite_SS<54~'yes',
                                composite_SS>146~'yes',
                                .default='no'),
-           composite_SS=case_when(composite_SS<46~46,
+           composite_SS=case_when(composite_SS<54~54,
                                   composite_SS>146~146,
                                   .default=composite_SS),
-           composite_SS_SE=(composite_CSS_SE/lang_sd)*15,
+           composite_SS_SE=(composite_CSS_SE/MullenLang_sd)*15,
            composite_SS_SE=case_when(winsorize=='yes'~NA,
                                      .default=composite_SS_SE))%>%
     # confidence bands
     mutate(confidence_CSS_lower=composite_CSS-(1.645*composite_CSS_SE),
            confidence_CSS_upper=composite_CSS+(1.645*composite_CSS_SE),
-           confidence_SS_upper=(((confidence_CSS_upper-lang_ref)/lang_sd)*15)+100,
-           confidence_SS_lower=(((confidence_CSS_lower-lang_ref)/lang_sd)*15)+100)%>%
+           confidence_SS_upper=(((confidence_CSS_upper-MullenLang_ref)/MullenLang_sd)*15)+100,
+           confidence_SS_lower=(((confidence_CSS_lower-MullenLang_ref)/MullenLang_sd)*15)+100)%>%
     # national percentile
     mutate(natl_percentile=pnorm(composite_zscore,mean=0,sd=1)*100)%>%
     mutate(natl_percentile=case_when(natl_percentile>99~99,
                                      natl_percentile<1~1,
                                      .default=round(natl_percentile,0)))%>%
-    dplyr::select(-cs(lang_ref,lang_sd))%>%
+    dplyr::select(-c('MullenLang_ref','MullenLang_sd'))%>%
     # round everything to 6 digits
     mutate(across(where(is.numeric), ~round(.x, digits=6)))%>%
     mutate(score='language composite')
@@ -73,10 +74,10 @@ score_lang_norms<-function(mr_css=NA,me_css=NA,mr_css_se=NA,me_css_se=NA,age=NA)
     # ss 
     mutate(composite_zscore=((composite_CSS-MullenRec_ref)/MullenRec_sd),
            composite_SS=composite_zscore*15+100,
-           winsorize=case_when(composite_SS<46~'yes',
+           winsorize=case_when(composite_SS<54~'yes',
                                composite_SS>146~'yes',
                                .default='no'),
-           composite_SS=case_when(composite_SS<46~46,
+           composite_SS=case_when(composite_SS<54~54,
                                   composite_SS>146~146,
                                   .default=composite_SS),
            composite_SS_SE=(composite_CSS_SE/MullenRec_sd)*15,
@@ -92,7 +93,7 @@ score_lang_norms<-function(mr_css=NA,me_css=NA,mr_css_se=NA,me_css_se=NA,age=NA)
     mutate(natl_percentile=case_when(natl_percentile>99~99,
                                      natl_percentile<1~1,
                                      .default=round(natl_percentile,0)))%>%
-    dplyr::select(-cs(MullenRec_ref,MullenRec_sd))%>%
+    dplyr::select(-c('MullenRec_ref','MullenRec_sd'))%>%
     # round everything to 6 digits
     mutate(across(where(is.numeric), ~round(.x, digits=6)))%>%
     mutate(score='mullen receptive')
@@ -111,10 +112,10 @@ score_lang_norms<-function(mr_css=NA,me_css=NA,mr_css_se=NA,me_css_se=NA,age=NA)
     # ss 
     mutate(composite_zscore=((composite_CSS-MullenExp_ref)/MullenExp_sd),
            composite_SS=composite_zscore*15+100,
-           winsorize=case_when(composite_SS<46~'yes',
+           winsorize=case_when(composite_SS<54~'yes',
                                composite_SS>146~'yes',
                                .default='no'),
-           composite_SS=case_when(composite_SS<46~46,
+           composite_SS=case_when(composite_SS<54~54,
                                   composite_SS>146~146,
                                   .default=composite_SS),
            composite_SS_SE=(composite_CSS_SE/MullenExp_sd)*15,
@@ -130,7 +131,7 @@ score_lang_norms<-function(mr_css=NA,me_css=NA,mr_css_se=NA,me_css_se=NA,age=NA)
     mutate(natl_percentile=case_when(natl_percentile>99~99,
                                      natl_percentile<1~1,
                                      .default=round(natl_percentile,0)))%>%
-    dplyr::select(-cs(MullenExp_ref,MullenExp_sd))%>%
+    dplyr::select(-c('MullenExp_ref','MullenExp_sd'))%>%
     # round everything to 6 digits
     mutate(across(where(is.numeric), ~round(.x, digits=6)))%>%
     mutate(score='mullen expressive')
@@ -139,12 +140,13 @@ score_lang_norms<-function(mr_css=NA,me_css=NA,mr_css_se=NA,me_css_se=NA,age=NA)
   }
   
   out<-lang_out%>%
-    rbind(mr_out)%>%
-    rbind(me_out)%>%
-    dplyr::select_if(~sum(!is.na(.))>0)%>%
-    dplyr::select(contains(c('score','composite','SS','natl')))%>%
+    bind_rows(mr_out)%>%
+    bind_rows(me_out)%>%
     rename_all(~str_remove(.,'composite_'))%>%
-    dplyr::select(-'zscore')
+    dplyr::select(c('score','CSS','CSS_SE','SS','SS_SE',
+                    'confidence_CSS_lower','confidence_CSS_upper',
+                    'confidence_SS_lower','confidence_SS_upper',
+                    'natl_percentile'))
   
   return(out)
 }
