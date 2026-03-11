@@ -738,71 +738,71 @@ for(i in 1:length(item_export_files)){
         lang_norms=NULL
       }
 
-      #### score EFMem composite + get norms ####
-      if(!is.null(mtl_scored)&&!is.null(mtt_scored)&&!is.null(vdr_scored)&&
-         age>=22&&age<=42){
-        efmem_norms=score_efmem_norms(mtl_css=mtl_scored$CSS,
-                                      mtt_css=mtt_scored$CSS,
-                                      vdr_css=vdr_scored$CSS,
-                                      mtl_css_se=mtl_scored$CSS_SE,
-                                      mtt_css_se=mtt_scored$CSS_SE,
-                                      vdr_css_se=vdr_scored$CSS_SE,
-                                      age=age)%>%
-          mutate(pid=pid,
-                 age=age)
-      }else{
-        efmem_norms=NULL
-      }
+      # #### score EFMem composite + get norms ####
+      # if(!is.null(mtl_scored)&&!is.null(mtt_scored)&&!is.null(vdr_scored)&&
+      #    age>=22&&age<=42){
+      #   efmem_norms=score_efmem_norms(mtl_css=mtl_scored$CSS,
+      #                                 mtt_css=mtt_scored$CSS,
+      #                                 vdr_css=vdr_scored$CSS,
+      #                                 mtl_css_se=mtl_scored$CSS_SE,
+      #                                 mtt_css_se=mtt_scored$CSS_SE,
+      #                                 vdr_css_se=vdr_scored$CSS_SE,
+      #                                 age=age)%>%
+      #     mutate(pid=pid,
+      #            age=age)
+      # }else{
+      #   efmem_norms=NULL
+      # }
 
-      #### score Math composite + get norms ####
-      if(!is.null(whm_scored)&&!is.null(sub_scored)&&!is.null(counting_scored)&&
-         age>=25&&age<=42){
-        math_norms=score_math_norms(whm_css=whm_scored$CSS,
-                                      sub_css=sub_scored$CSS,
-                                      counting_css=counting_scored$CSS,
-                                      whm_css_se=whm_scored$CSS_SE,
-                                      sub_css_se=sub_scored$CSS_SE,
-                                      counting_css_se=counting_scored$CSS_SE,
-                                      age=age)%>%
-          mutate(pid=pid,
-                 age=age)
-      }else{
-        math_norms=NULL
-      }
+      # #### score Math composite + get norms ####
+      # if(!is.null(whm_scored)&&!is.null(sub_scored)&&!is.null(counting_scored)&&
+      #    age>=25&&age<=42){
+      #   math_norms=score_math_norms(whm_css=whm_scored$CSS,
+      #                                 sub_css=sub_scored$CSS,
+      #                                 counting_css=counting_scored$CSS,
+      #                                 whm_css_se=whm_scored$CSS_SE,
+      #                                 sub_css_se=sub_scored$CSS_SE,
+      #                                 counting_css_se=counting_scored$CSS_SE,
+      #                                 age=age)%>%
+      #     mutate(pid=pid,
+      #            age=age)
+      # }else{
+      #   math_norms=NULL
+      # }
 
-      #### score Cognition composite + get norms ####
-      if(!is.null(mr_scored)&&!is.null(me_scored)&&
-         !is.null(mtl_scored)&&!is.null(mtt_scored)&&!is.null(vdr_scored)&&
-         !is.null(whm_scored)&&!is.null(sub_scored)&&!is.null(counting_scored)&&
-         age>=25&&age<=42){
-        cog_norms=score_cog_norms(mr_css=mr_scored$CSS,
-                                  me_css=me_scored$CSS,
-                                  mr_css_se=mr_scored$CSS_SE,
-                                  me_css_se=me_scored$CSS_SE,
-                                  mtl_css=mtl_scored$CSS,
-                                  mtt_css=mtt_scored$CSS,
-                                  vdr_css=vdr_scored$CSS,
-                                  mtl_css_se=mtl_scored$CSS_SE,
-                                  mtt_css_se=mtt_scored$CSS_SE,
-                                  vdr_css_se=vdr_scored$CSS_SE,
-                                  whm_css=whm_scored$CSS,
-                                  sub_css=sub_scored$CSS,
-                                  counting_css=counting_scored$CSS,
-                                  whm_css_se=whm_scored$CSS_SE,
-                                  sub_css_se=sub_scored$CSS_SE,
-                                  counting_css_se=counting_scored$CSS_SE,
-                                  age=age)%>%
-          mutate(pid=pid,
-                 age=age)
-      }else{
-        cog_norms=NULL
-      }
+      # #### score Cognition composite + get norms ####
+      # if(!is.null(mr_scored)&&!is.null(me_scored)&&
+      #    !is.null(mtl_scored)&&!is.null(mtt_scored)&&!is.null(vdr_scored)&&
+      #    !is.null(whm_scored)&&!is.null(sub_scored)&&!is.null(counting_scored)&&
+      #    age>=25&&age<=42){
+      #   cog_norms=score_cog_norms(mr_css=mr_scored$CSS,
+      #                             me_css=me_scored$CSS,
+      #                             mr_css_se=mr_scored$CSS_SE,
+      #                             me_css_se=me_scored$CSS_SE,
+      #                             mtl_css=mtl_scored$CSS,
+      #                             mtt_css=mtt_scored$CSS,
+      #                             vdr_css=vdr_scored$CSS,
+      #                             mtl_css_se=mtl_scored$CSS_SE,
+      #                             mtt_css_se=mtt_scored$CSS_SE,
+      #                             vdr_css_se=vdr_scored$CSS_SE,
+      #                             whm_css=whm_scored$CSS,
+      #                             sub_css=sub_scored$CSS,
+      #                             counting_css=counting_scored$CSS,
+      #                             whm_css_se=whm_scored$CSS_SE,
+      #                             sub_css_se=sub_scored$CSS_SE,
+      #                             counting_css_se=counting_scored$CSS_SE,
+      #                             age=age)%>%
+      #     mutate(pid=pid,
+      #            age=age)
+      # }else{
+      #   cog_norms=NULL
+      # }
 
       #### output scored data into a table #####
       output<-data.frame(lang_norms)%>%
-        dplyr::bind_rows(efmem_norms)%>%
-        dplyr::bind_rows(math_norms)%>%
-        dplyr::bind_rows(cog_norms)%>%
+        # dplyr::bind_rows(efmem_norms)%>%
+        # dplyr::bind_rows(math_norms)%>%
+        # dplyr::bind_rows(cog_norms)%>%
         dplyr::bind_rows(mvr_scored)%>%
         dplyr::bind_rows(lwl_scored)%>%
         dplyr::bind_rows(ef_scored)%>%
